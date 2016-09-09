@@ -1,14 +1,15 @@
 'use strict';
 
 let slack = require('slack');
+let bot = require('../bot-framework/utilities');
 
 module.exports.command = (event, context, callback) => {
-	let responseBody = slack.transformResponse(event);
-	slack.postResponse(event.context.responseUrl, responseBody, (result) => {
-		callback(null, { function: 'command', result: result });	
-	});
+	callback(null, { function: 'command', event, context });
 }
 
 module.exports.callback = (event, context, callback) => {
-	callback(null, { function: 'callback', event, context });
+	let slackBody = slack.transformResponse(event);
+	bot.postToUrl(event.context.responseUrl, slackBody, (result) => {
+		callback(null, { function: 'callback', result: result });	
+	});
 }
