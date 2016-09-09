@@ -1,0 +1,5 @@
+{
+	"callbackUrl": "https://fdtdlzk0ke.execute-api.us-west-2.amazonaws.com/dev/callback",
+	"responseUrl": "https://hooks.slack.com/commands/T1J329BG8/77917111111/6seeSnfkJrDPK230hnLzeQDu",
+	"botUrl": "https://xb5qr6apmj.execute-api.us-west-2.amazonaws.com/dev/input"
+}
