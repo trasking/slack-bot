@@ -3,14 +3,12 @@ service: slack-bot
 provider:
   name: aws
   runtime: nodejs4.3
+  stage: dev
+  region: us-west-2
 
-defaults:
- stage: dev
- region: us-west-2
-
-package:
-  include:
-    - "../bot-framework/shared/bot.js"
+# package:
+#   include:
+#     - "../bot-framework/shared/bot.js"
 
 functions:
 
@@ -21,6 +19,9 @@ functions:
       - http:
           path: command
           method: post
+          # request:
+          #   template:
+          #     application/x-www-form-urlencoded: ${formTemplate}
 
   callback:
     handler: handler.callback

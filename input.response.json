@@ -1,10 +1,22 @@
 {
   "status" : "ok",
   "detail" : "no problems here",
+  "initial_text": "This is the initial text",
   "responses" : [
     {
-      "primary_text" : "This is the primary text",
-      "secondary_text" : "This is the secondary text",
+      "basic_text": "This is the basic text",
+      "title_text" : "This is the title text",
+      "subtitle_text" : "This is the subtitle text",
+      "text_fields": [
+        {
+          "title": "Field 1",
+          "text": "This is field 1 text"
+        },
+        {
+          "title": "Field 2",
+          "text": "This is field 2 text"
+        }
+      ],
       "image" : "http://abc.com",
       "actions" : [
         {
