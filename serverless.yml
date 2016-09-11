@@ -6,9 +6,9 @@ provider:
   stage: dev
   region: us-west-2
 
-# package:
-#   include:
-#     - "../bot-framework/shared/bot.js"
+package:
+  include:
+    - functions
 
 functions:
 
