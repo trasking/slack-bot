@@ -20,6 +20,25 @@ functions:
           path: command
           method: post
 
+  action:
+    handler: handler.action
+    memorySize: 128
+    events:
+      - http:
+          path: action
+          method: post
+          request:
+            template:
+              application/x-www-form-urlencoded: ${file(action.vtl)}
+
+  event:
+    handler: handler.event
+    memorySize: 128
+    events:
+      - http:
+          path: event
+          method: post
+
   callback:
     handler: handler.callback
     memorySize: 128
