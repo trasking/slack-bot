@@ -29,40 +29,39 @@ module.exports.command = (event, context, callback) => {
 }
 
 module.exports.action = (event, context, callback) => {
-
-	let body = querystring.parse(event.body);
-	let payload = JSON.parse(body)
+	// let body = querystring.parse(event.body);
+	// let payload = JSON.parse(body)
 	
-	let slackContext = {
-		team_id: payload.team.id,
-		team_domain: payload.team.domain,
-		channel_id: payload.channel.id,
-		channel_name: payload.channel.name,
-		user_id: payload.user.id,
-		user_name: payload.user.name,
-		response_url: payload.response_url 
-	}
+	// let slackContext = {
+	// 	team_id: payload.team.id,
+	// 	team_domain: payload.team.domain,
+	// 	channel_id: payload.channel.id,
+	// 	channel_name: payload.channel.name,
+	// 	user_id: payload.user.id,
+	// 	user_name: payload.user.name,
+	// 	response_url: payload.response_url 
+	// }
 
-	let request = {
-		input: {
-			text: null,
-			action: payload.actions[0].name,
-			payload: JSON.parse(payload.actions[0].value)
-		},
-		context: {
-			user: payload.user.id,
-			callback: event.stageVariables.callbackUrl,
-			slack: slackContext
-		}
-	};
+	// let request = {
+	// 	input: {
+	// 		text: null,
+	// 		action: payload.actions[0].name,
+	// 		payload: JSON.parse(payload.actions[0].value)
+	// 	},
+	// 	context: {
+	// 		user: payload.user.id,
+	// 		callback: event.stageVariables.callbackUrl,
+	// 		slack: slackContext
+	// 	}
+	// };
 
-	console.log(request);
+	// console.log(request);
 
-	bot.postToUrl(event.stageVariables.botUrl, request, (result) => {
+	// bot.postToUrl(event.stageVariables.botUrl, request, (result) => {
 			
-	});
+	// });
 
-	callback(null, 'dude');
+	callback(null, event);
 }
 
 module.exports.event = (event, context, callback) => {
