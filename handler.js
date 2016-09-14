@@ -84,3 +84,6 @@ module.exports.event = (event, context, callback) => {
 		callback();
 	}
 };
+
+
+//aws apigateway update-stage --rest-api-id bt5l1uujh7 --stage development --patch-operations op=replace,path=/variables/apiKey,value=dude
