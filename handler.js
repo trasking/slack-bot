@@ -1,8 +1,8 @@
 'use strict'
 
 const querystring = require('querystring');
-const slack = require('slack');
-const bot = require('bot');
+const slack = require('modules/slack');
+const bot = require('modules/bot');
 
 module.exports.command = (event, context, callback) => {
 
@@ -21,11 +21,11 @@ module.exports.command = (event, context, callback) => {
 
 	console.log(request);
 
-	bot.postToUrl(event.stageVariables.bot_url, request, (result) => {
-
+	bot.publishSNS(request, 'arn:aws:sns:us-west-2:084075158741:bot-framework-input', (error, data) => {
+		var result = { error: error, data: data };
+		console.log(result);
+		callback(null, result);
 	});
-
-	callback(null, 'command done!');
 
 };
 

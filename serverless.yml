@@ -5,6 +5,8 @@ provider:
   runtime: nodejs4.3
   stage: dev
   region: us-west-2
+  iamRoleStatements:
+    - ${file(policies/sns.json)}
 
 package:
   include:
@@ -20,7 +22,7 @@ functions:
           path: command
           method: post
           response:
-            template: ${file(empty.vtl)}
+            template: ${file(templates/empty.vtl)}
 
 
   action:
@@ -32,9 +34,9 @@ functions:
           method: post
           request:
             template:
-              application/x-www-form-urlencoded: ${file(action.vtl)}
+              application/x-www-form-urlencoded: ${file(templates/action.vtl)}
           response:
-            template: ${file(empty.vtl)}
+            template: ${file(templates/empty.vtl)}
 
   event:
     handler: handler.event
@@ -51,12 +53,6 @@ functions:
       - http:
           path: callback
           method: post
-
-#   you can add any of the following events
-
-#     - s3: ${bucket}
-#     - schedule: rate(10 minutes)
-#     - sns: greeter-topic
 
 # you can add CloudFormation resource templates here
 #resources:
