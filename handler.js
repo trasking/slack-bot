@@ -14,6 +14,7 @@ module.exports.command = (event, context, callback) => {
 		},
 		context: {
 			user: event.body.user_id,
+			group: event.body.team_id,
 			callback: event.stageVariables.callback_url,
 			slack: event.body
 		}
