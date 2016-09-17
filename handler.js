@@ -3,6 +3,7 @@
 const querystring = require('querystring');
 const slack = require('modules/slack');
 const bot = require('modules/bot');
+const request = require('request');
 
 module.exports.command = (event, context, callback) => {
 
@@ -34,46 +35,52 @@ module.exports.callback = (event, context, callback) => {
 	console.log(event.body);
 	let payload = slack.transformResponse(event.body);
 	console.log(payload);
-	bot.postToUrl(event.body.context.slack.response_url, payload, (result) => {
-		callback(null, { function: 'callback', result: result });
-	});
+	request({
+    method: 'POST',
+    url: event.body.context.slack.response_url,
+    body: payload,
+    json: true
+  }, (error, response, data) => {
+      callback(null, { status: response.statusCode, error: error, data: data });
+  });
 };
 
 module.exports.action = (event, context, callback) => {
 
 	let body = querystring.parse(event.body);
-	let payload = JSON.parse(body.payload);
+	let info = JSON.parse(body.payload);
 
 	let slackContext = {
-		team_id: payload.team.id,
-		team_domain: payload.team.domain,
-		channel_id: payload.channel.id,
-		channel_name: payload.channel.name,
-		user_id: payload.user.id,
-		user_name: payload.user.name,
-		response_url: payload.response_url
+		team_id: info.team.id,
+		team_domain: info.team.domain,
+		channel_id: info.channel.id,
+		channel_name: info.channel.name,
+		user_id: info.user.id,
+		user_name: info.user.name,
+		response_url: info.response_url
 	};
 
-	let request = {
+	let payload = {
 		input: {
 			text: null,
-			action: payload.actions[0].name,
-			payload: JSON.parse(payload.actions[0].value)
+			action: info.actions[0].name,
+			payload: JSON.parse(info.actions[0].value)
 		},
 		context: {
-			user: payload.user.id,
+			user: info.user.id,
 			callback: event.stageVariables.callback_url,
 			slack: slackContext
 		}
 	};
 
-	console.log(request);
-
-	bot.postToUrl(event.stageVariables.bot_url, request, (result) => {
-
-	});
-
-	callback(null, 'action done!');
+	request({
+		method: 'POST',
+		url: event.stageVariables.bot_url,
+		body: payload,
+		json: true
+  }, (error, response, data) => {
+		callback(null, { status: response.statusCode, error: error, data: data });
+  });
 };
 
 module.exports.event = (event, context, callback) => {
