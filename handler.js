@@ -7,7 +7,7 @@ const request = require('request');
 
 module.exports.command = (event, context, callback) => {
 
-	let request = {
+	let payload = {
 		input: {
 			text: event.body.text,
 			action: event.body.command.slice(1),
@@ -21,9 +21,9 @@ module.exports.command = (event, context, callback) => {
 		}
 	};
 
-	console.log(request);
+	console.log(payload);
 
-	bot.publishSNS(request, 'arn:aws:sns:us-west-2:084075158741:bot-framework-input', (error, data) => {
+	bot.publishSNS(payload, 'arn:aws:sns:us-west-2:084075158741:bot-framework-input', (error, data) => {
 		var result = { error: error, data: data };
 		console.log(result);
 		callback(null, result);
@@ -41,7 +41,7 @@ module.exports.callback = (event, context, callback) => {
     body: payload,
     json: true
   }, (error, response, data) => {
-      callback(null, { status: response.statusCode, error: error, data: data });
+		callback(null, { error: error, response: response, data: data });
   });
 };
 
@@ -68,19 +68,17 @@ module.exports.action = (event, context, callback) => {
 		},
 		context: {
 			user: info.user.id,
+			group: info.team.id,
 			callback: event.stageVariables.callback_url,
 			slack: slackContext
 		}
 	};
 
-	request({
-		method: 'POST',
-		url: event.stageVariables.bot_url,
-		body: payload,
-		json: true
-  }, (error, response, data) => {
-		callback(null, { status: response.statusCode, error: error, data: data });
-  });
+	bot.publishSNS(payload, 'arn:aws:sns:us-west-2:084075158741:bot-framework-input', (error, data) => {
+		var result = { error: error, data: data };
+		console.log(result);
+		callback(null, result);
+	});
 };
 
 module.exports.event = (event, context, callback) => {
@@ -89,7 +87,33 @@ module.exports.event = (event, context, callback) => {
 		callback(null, { challenge: event.body.challenge } );
 	}
 	else {
-		callback();
+		if (event.body.event.text.match(/^<@U268PTX26>/)) {
+
+			let slackContext = {
+				team_id: event.body.team_id,
+				team_domain: info.team.domain,
+				channel_id: event.body.event.channel,
+				user_id: event.body.event.user,
+				response_url: info.response_url
+			};
+
+			let payload = {
+				input: { text: event.body.event.text },
+				context: {
+					user: event.body.event.user,
+					group: event.body.team_id,
+					callback: event.stageVariables.callback_url,
+					slack: slackContext
+				}
+			};
+		}
+
+		bot.publishSNS(payload, 'arn:aws:sns:us-west-2:084075158741:bot-framework-input', (error, data) => {
+			var result = { error: error, data: data };
+			console.log(result);
+			callback(null, result);
+		});
+
 	}
 };
 
