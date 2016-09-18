@@ -24,13 +24,13 @@
           "text" : "Button Text",
           "payload" : { "fake": "payload" },
           "default" : true
-        } 
+        }
       ]
     }
   ],
   "context": {
     "user": "1234",
     "responseUrl": "https://hooks.slack.com/commands/T1J329BG8/77430009349/eNxKHGR1vgg2mRB8iy4iVu87",
-    "callbackUrl": "https://abc.com"  
+    "service_endpoint": "https://abc.com"  
   }
 }

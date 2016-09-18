@@ -48,7 +48,7 @@
 		"user": ""
 	},
 	"stageVariables": {
-		"callbackUrl": "https://dpw5548x5e.execute-api.us-west-2.amazonaws.com/dev/callback",
+		"service_endpoint": "https://dpw5548x5e.execute-api.us-west-2.amazonaws.com/dev/callback",
 		"botUrl": "https://o86iytd82f.execute-api.us-west-2.amazonaws.com/dev/input",
 		"verificationToken": "cpz1VEunG2taKWJkOTjHccFV"
 	}

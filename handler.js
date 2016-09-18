@@ -16,7 +16,7 @@ module.exports.command = (event, context, callback) => {
 		context: {
 			user: event.body.user_id,
 			group: event.body.team_id,
-			callback: event.stageVariables.callback_url,
+			service_endpoint: `https://${event.headers.Host}/${event.stage}`,
 			slack: event.body
 		}
 	};
@@ -69,7 +69,7 @@ module.exports.action = (event, context, callback) => {
 		context: {
 			user: info.user.id,
 			group: info.team.id,
-			callback: event.stageVariables.callback_url,
+			service_endpoint: `https://${event.headers.Host}/${event.stage}`,
 			slack: slackContext
 		}
 	};
@@ -102,7 +102,7 @@ module.exports.event = (event, context, callback) => {
 				context: {
 					user: event.body.event.user,
 					group: event.body.team_id,
-					callback: event.stageVariables.callback_url,
+					service_endpoint: `https://${event.headers.Host}/${event.stage}`,
 					slack: slackContext
 				}
 			};
