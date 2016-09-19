@@ -54,6 +54,14 @@ functions:
           path: callback
           method: post
 
+  user:
+    handler: handler.user
+    memorySize: 128
+    events:
+      - http:
+          path: user
+          method: get
+
 # you can add CloudFormation resource templates here
 #resources:
 #  Resources:

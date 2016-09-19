@@ -14,8 +14,8 @@ module.exports.command = (event, context, callback) => {
 			payload: null
 		},
 		context: {
-			user: event.body.user_id,
-			group: event.body.team_id,
+			user: { user_id: event.body.user_id },
+			group: { group_id: event.body.team_id },
 			service_endpoint: `https://${event.headers.Host}/${event.stage}`,
 			slack: event.body
 		}
@@ -67,8 +67,8 @@ module.exports.action = (event, context, callback) => {
 			payload: JSON.parse(info.actions[0].value)
 		},
 		context: {
-			user: info.user.id,
-			group: info.team.id,
+			user: { user_id: info.user.id },
+			group: { group_id: info.team.id },
 			service_endpoint: `https://${event.headers.Host}/${event.stage}`,
 			slack: slackContext
 		}
@@ -100,8 +100,8 @@ module.exports.event = (event, context, callback) => {
 			let payload = {
 				input: { text: event.body.event.text },
 				context: {
-					user: event.body.event.user,
-					group: event.body.team_id,
+					user: { user_id: event.body.event.user },
+					group: { group_id: event.body.team_id },
 					service_endpoint: `https://${event.headers.Host}/${event.stage}`,
 					slack: slackContext
 				}
@@ -117,5 +117,42 @@ module.exports.event = (event, context, callback) => {
 	}
 };
 
+module.exports.user = (event, context, callback) => {
+	var slackContext = JSON.parse(event.headers['x-bot-context']);
+	if (slackContext.user && slackContext.user.user_id) {
+			if (slackContext.group && slackContext.group.team_access_token) {
+				var params = {
+					url: "https://slack.com/api/users.info",
+					form: { token: slackContext.group.team_access_token, user: slackContext.user.user_id }
+				};
+				request.post(params, (error, response, data) => {
+					if(error) {
+						callback(null, { status: 'error', detail: error });
+					} else if (200 != response.statusCode) {
+						callback(null, { status: 'error', detail: `(${response.statusCode}) Unable to retrieve user data`})
+					} else {
+						var result = JSON.parse(data);
+						if (result.ok) {
+							var user = {
+								user_id: result.user.id,
+								first_name: result.user.profile.first_name,
+								last_name: result.user.profile.last_name,
+								full_name: result.user.profile.real_name,
+								handle: result.user.name,
+								email: result.user.profile.email
+							};
+							callback(null, { status: 'ok', user: user });
+						} else {
+							callback(null, { status: 'error', detail: result });
+						}
+					}
+				});
+			} else {
+					callback(null, { status: 'error', detail: 'no team access token provided'});
+			}
+	} else {
+		callback(null, { status: 'error', detail: 'no user id provided'});
+	}
+};
 
 //aws apigateway update-stage --rest-api-id bt5l1uujh7 --stage development --patch-operations op=replace,path=/variables/apiKey,value=dude
