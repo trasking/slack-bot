@@ -87,8 +87,6 @@ module.exports.event = (event, context, callback) => {
 		callback(null, { challenge: event.body.challenge } );
 	}
 	else {
-		if (event.body.event.text.match(/^<@U268PTX26>/)) {
-
 			let slackContext = {
 				team_id: event.body.team_id,
 				team_domain: info.team.domain,
@@ -96,7 +94,6 @@ module.exports.event = (event, context, callback) => {
 				user_id: event.body.event.user,
 				response_url: info.response_url
 			};
-
 			let payload = {
 				input: { text: event.body.event.text },
 				context: {
@@ -106,14 +103,12 @@ module.exports.event = (event, context, callback) => {
 					slack: slackContext
 				}
 			};
-		}
 
 		bot.publishSNS(payload, 'arn:aws:sns:us-west-2:084075158741:bot-framework-input', (error, data) => {
 			var result = { error: error, data: data };
 			console.log(result);
 			callback(null, result);
 		});
-
 	}
 };
 
