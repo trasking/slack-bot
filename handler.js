@@ -82,32 +82,45 @@ module.exports.action = (event, context, callback) => {
 };
 
 module.exports.event = (event, context, callback) => {
-	console.log(event.body);
+	console.log(event);
 	if (event.body.challenge) {
 		callback(null, { challenge: event.body.challenge } );
-	}
-	else {
-			let slackContext = {
-				team_id: event.body.team_id,
-				team_domain: info.team.domain,
-				channel_id: event.body.event.channel,
-				user_id: event.body.event.user,
-				response_url: info.response_url
-			};
-			let payload = {
-				input: { text: event.body.event.text },
-				context: {
-					user: { user_id: event.body.event.user },
-					group: { group_id: event.body.team_id },
-					service_endpoint: `https://${event.headers.Host}/${event.stage}`,
-					slack: slackContext
+	} else {
+		request(`${event.stageVariables.bot_endpoint}/group?id=${event.body.team_id}`, (error, response, data) => {
+			if (error) {
+				console.log('REQUEST ERROR', error);
+				callback(null, { status: 'error', detail: error });
+			} else {
+				var groupResult = JSON.parse(data);
+				if ('ok' != groupResult.status) {
+					console.log('BOT ERROR', groupResult);
+					callback(null, { status: 'error', detail: groupResult.detail });
+				} else {
+					var botTag = `<@${groupResult.group.bot_user_id}>`
+					var botExp = new RegExp(`^${botTag}`);
+					if (botExp.test(event.body.event.text)) {
+						let slackContext = {
+							channel_id: event.body.event.channel
+						};
+						let payload = {
+							input: { text: event.body.event.text.slice(botTag.length).trim() },
+							context: {
+								user: { user_id: event.body.event.user },
+								group: { group_id: event.body.team_id },
+								service_endpoint: `https://${event.headers.Host}/${event.stage}`,
+								slack: slackContext
+							}
+						};
+						bot.publishSNS(payload, 'arn:aws:sns:us-west-2:084075158741:bot-framework-input', (snsError, snsData) => {
+							var result = { error: snsError, data: snsData };
+							console.log(result);
+							callback(null, result);
+						});
+					} else {
+						console.log('NO MATCH', botExp, event.body.event.text);
+					}
 				}
-			};
-
-		bot.publishSNS(payload, 'arn:aws:sns:us-west-2:084075158741:bot-framework-input', (error, data) => {
-			var result = { error: error, data: data };
-			console.log(result);
-			callback(null, result);
+			}
 		});
 	}
 };
