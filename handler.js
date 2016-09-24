@@ -32,17 +32,11 @@ module.exports.command = (event, context, callback) => {
 };
 
 module.exports.callback = (event, context, callback) => {
-	console.log(event.body);
-	let payload = slack.transformResponse(event.body);
-	console.log(payload);
-	request({
-    method: 'POST',
-    url: event.body.context.slack.response_url,
-    body: payload,
-    json: true
-  }, (error, response, data) => {
-		callback(null, { error: error, response: response, data: data });
-  });
+	// console.log('EVENT', event);
+	// console.log('CONTEXT', event.body.context);
+	// console.log('SLACK', event.body.context.slack);
+	// callback(null, "dude");
+	slack.processResponse(event, callback);
 };
 
 module.exports.action = (event, context, callback) => {
@@ -99,16 +93,13 @@ module.exports.event = (event, context, callback) => {
 					var botTag = `<@${groupResult.group.bot_user_id}>`
 					var botExp = new RegExp(`^${botTag}`);
 					if (botExp.test(event.body.event.text)) {
-						let slackContext = {
-							channel_id: event.body.event.channel
-						};
 						let payload = {
 							input: { text: event.body.event.text.slice(botTag.length).trim() },
 							context: {
 								user: { user_id: event.body.event.user },
 								group: { group_id: event.body.team_id },
 								service_endpoint: `https://${event.headers.Host}/${event.stage}`,
-								slack: slackContext
+								slack: { channel_id: event.body.event.channel	}
 							}
 						};
 						bot.publishSNS(payload, 'arn:aws:sns:us-west-2:084075158741:bot-framework-input', (snsError, snsData) => {

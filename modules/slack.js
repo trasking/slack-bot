@@ -1,5 +1,8 @@
 'use strict'
 
+const slack = require('modules/slack');
+const request = require('request');
+
 module.exports.transformResponse = (response) => {
 
 	let result = {
@@ -53,4 +56,37 @@ module.exports.transformResponse = (response) => {
 	}
 
 	return result;
+};
+
+module.exports.processResponse = (event, callback) => {
+
+	let payload = slack.transformResponse(event.body);
+
+	if (event.body.context.slack.response_url) {
+		request.post({
+			url: event.body.context.slack.response_url,
+			body: payload,
+			json: true
+		}, (error, response, data) => {
+			callback(null, { error: error, response: response, data: data });
+		});
+	} else {
+		let params = {
+			text: payload.text,
+			token: event.body.context.group.bot_access_token,
+			channel: event.body.context.slack.channel_id,
+			as_user: true
+		};
+		if (payload.attachments) {
+			params.attachments = JSON.stringify(payload.attachments);
+		}
+		console.log('chat.postMessage PARAMS', params);
+		request.post({
+			url: 'https://slack.com/api/chat.postMessage',
+			form: params
+		}, (error, response, data) => {
+			callback(null, { error: error, response: response, data: data });
+		});
+	}
+
 };
